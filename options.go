@@ -4,14 +4,34 @@ type options interface {
 	apply(*HandlerGenerate)
 }
 
-type FieldName struct {
+type fieldName struct {
 	TableFieldName string
 	ModelFieldName string
 	IsNumber       bool
 }
 
-type AllowActions struct {
+func WithKeyFieldName(tableFieldName, modelFieldName string, isNumber bool) fieldName {
+	return fieldName{TableFieldName: tableFieldName, ModelFieldName: modelFieldName, IsNumber: isNumber}
+}
+
+func (fn *fieldName) apply(handlerGenerate *HandlerGenerate) {
+	handlerGenerate.fieldKey.TableFieldName = fn.TableFieldName
+	handlerGenerate.fieldKey.ModelFieldName = fn.ModelFieldName
+	handlerGenerate.fieldKey.IsNumber = fn.IsNumber
+}
+
+type allowActions struct {
 	actions []string
+}
+
+func WithAllowActions(actions ...string) allowActions {
+	return allowActions{actions: actions}
+}
+
+func (a *allowActions) apply(handlerGenerate *HandlerGenerate) {
+	for _, action := range a.actions {
+		handlerGenerate.allowActions[action] = struct{}{}
+	}
 }
 
 type FilterOption struct {
@@ -19,35 +39,15 @@ type FilterOption struct {
 	IsString       bool
 }
 
-type Filterable struct {
+type filterable struct {
 	filter []FilterOption
 }
 
-func WithKeyFieldName(tableFieldName, modelFieldName string, isNumber bool) FieldName {
-	return FieldName{TableFieldName: tableFieldName, ModelFieldName: modelFieldName, IsNumber: isNumber}
+func WithFieldFilter(tableFields ...FilterOption) filterable {
+	return filterable{filter: tableFields}
 }
 
-func (fn *FieldName) apply(handlerGenerate *HandlerGenerate) {
-	handlerGenerate.fieldKey.TableFieldName = fn.TableFieldName
-	handlerGenerate.fieldKey.ModelFieldName = fn.ModelFieldName
-	handlerGenerate.fieldKey.IsNumber = fn.IsNumber
-}
-
-func WithAllowActions(actions ...string) AllowActions {
-	return AllowActions{actions: actions}
-}
-
-func (a *AllowActions) apply(handlerGenerate *HandlerGenerate) {
-	for _, action := range a.actions {
-		handlerGenerate.allowActions[action] = struct{}{}
-	}
-}
-
-func WithFieldFilter(tableFields ...FilterOption) Filterable {
-	return Filterable{filter: tableFields}
-}
-
-func (f *Filterable) apply(handlerGenerate *HandlerGenerate) {
+func (f *filterable) apply(handlerGenerate *HandlerGenerate) {
 	for _, fil := range f.filter {
 		handlerGenerate.filterableFields[fil.FieldTableName] = isString(fil.IsString)
 	}

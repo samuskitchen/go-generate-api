@@ -25,7 +25,7 @@ const (
 type isString bool
 
 type HandlerGenerate struct {
-	fieldKey         FieldName
+	fieldKey         fieldName
 	allowActions     map[string]struct{}
 	translateFields  map[string]string
 	filterableFields map[string]isString
@@ -34,9 +34,9 @@ type HandlerGenerate struct {
 	storage *storage
 }
 
-func NewHandlerMan(g *echo.Group, conn *gorm.DB) *HandlerGenerate {
+func NewHandlerGenerate(g *echo.Group, conn *gorm.DB) *HandlerGenerate {
 	return &HandlerGenerate{
-		fieldKey: FieldName{
+		fieldKey: fieldName{
 			TableFieldName: "id",
 			ModelFieldName: "ID",
 			IsNumber:       true,
@@ -53,8 +53,8 @@ func NewHandlerMan(g *echo.Group, conn *gorm.DB) *HandlerGenerate {
 	}
 }
 
-func (hg *HandlerGenerate) Start(i interface{}, options ...options) error {
-	rType := reflect.TypeOf(i)
+func (hg *HandlerGenerate) Start(entry interface{}, options ...options) error {
+	rType := reflect.TypeOf(entry)
 	if rType.Kind() == reflect.Ptr {
 		if rType.Elem().Kind() != reflect.Struct {
 			return fmt.Errorf("error, a structure was expected")
@@ -64,7 +64,7 @@ func (hg *HandlerGenerate) Start(i interface{}, options ...options) error {
 	}
 
 	hg.storage.rType = rType
-	hg.translateFields = getMapJsonFieldNameWithModelFieldName(i)
+	hg.translateFields = getMapJsonFieldNameWithModelFieldName(entry)
 	for _, op := range options {
 		op.apply(hg)
 	}
@@ -73,6 +73,7 @@ func (hg *HandlerGenerate) Start(i interface{}, options ...options) error {
 
 	return nil
 }
+
 func (hg *HandlerGenerate) router() {
 	if _, ok := hg.allowActions[ActionFindAll]; ok {
 		hg.group.GET("", hg.findAll)

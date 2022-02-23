@@ -12,6 +12,7 @@ type filter struct {
 	fieldName string
 	value     interface{}
 }
+
 type storage struct {
 	rType reflect.Type
 	conn  *gorm.DB
