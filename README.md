@@ -30,7 +30,7 @@ import (
 	"log"
 
 	"github.com/labstack/echo/v4"
-	"github.com/samuskitchen/go-generate-api"
+	generateApi "github.com/samuskitchen/go-generate-api"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
@@ -64,12 +64,12 @@ func main() {
 	log.Println("Database opened!!")
 	e := echo.New()
 
-	h := generate.NewHandlerGenerate(e.Group("/person"), conn)
+	h := generateApi.NewHandlerGenerate(e.Group("/person"), conn)
 	h.Start(Person{})
 
-	handlerProduct := generate.NewHandlerGenerate(e.Group("/product"), conn) 
+	handlerProduct := generateApi.NewHandlerGenerate(e.Group("/product"), conn) 
 	//Name of the primary key field, in the table and the model
-	handlerProduct.Start(Product{}, generate.WithKeyFieldName("code", "Code", false))
+	handlerProduct.Start(Product{}, generateApi.WithKeyFieldName("code", "Code", false))
 	
 	e.Start("localhost:8080")
 }

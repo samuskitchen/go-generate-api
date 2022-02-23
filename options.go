@@ -14,7 +14,7 @@ func WithKeyFieldName(tableFieldName, modelFieldName string, isNumber bool) fiel
 	return fieldName{TableFieldName: tableFieldName, ModelFieldName: modelFieldName, IsNumber: isNumber}
 }
 
-func (fn *fieldName) apply(handlerGenerate *HandlerGenerate) {
+func (fn fieldName) apply(handlerGenerate *HandlerGenerate) {
 	handlerGenerate.fieldKey.TableFieldName = fn.TableFieldName
 	handlerGenerate.fieldKey.ModelFieldName = fn.ModelFieldName
 	handlerGenerate.fieldKey.IsNumber = fn.IsNumber
@@ -28,7 +28,7 @@ func WithAllowActions(actions ...string) allowActions {
 	return allowActions{actions: actions}
 }
 
-func (a *allowActions) apply(handlerGenerate *HandlerGenerate) {
+func (a allowActions) apply(handlerGenerate *HandlerGenerate) {
 	for _, action := range a.actions {
 		handlerGenerate.allowActions[action] = struct{}{}
 	}
@@ -47,7 +47,7 @@ func WithFieldFilter(tableFields ...FilterOption) filterable {
 	return filterable{filter: tableFields}
 }
 
-func (f *filterable) apply(handlerGenerate *HandlerGenerate) {
+func (f filterable) apply(handlerGenerate *HandlerGenerate) {
 	for _, fil := range f.filter {
 		handlerGenerate.filterableFields[fil.FieldTableName] = isString(fil.IsString)
 	}
